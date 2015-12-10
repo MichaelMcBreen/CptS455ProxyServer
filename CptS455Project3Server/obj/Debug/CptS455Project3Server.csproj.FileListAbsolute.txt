@@ -1,0 +1,6 @@
+c:\users\michael\documents\visual studio 2015\Projects\CptS455Project3Server\CptS455Project3Server\bin\Debug\CptS455Project3Server.exe.config
+c:\users\michael\documents\visual studio 2015\Projects\CptS455Project3Server\CptS455Project3Server\bin\Debug\CptS455Project3Server.exe
+c:\users\michael\documents\visual studio 2015\Projects\CptS455Project3Server\CptS455Project3Server\bin\Debug\CptS455Project3Server.pdb
+c:\users\michael\documents\visual studio 2015\Projects\CptS455Project3Server\CptS455Project3Server\obj\Debug\CptS455Project3Server.exe
+c:\users\michael\documents\visual studio 2015\Projects\CptS455Project3Server\CptS455Project3Server\obj\Debug\CptS455Project3Server.pdb
+c:\users\michael\documents\visual studio 2015\Projects\CptS455Project3Server\CptS455Project3Server\obj\Debug\CptS455Project3Server.csprojResolveAssemblyReference.cache
