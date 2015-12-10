@@ -38,7 +38,6 @@ public class AsynchronousSocketListener
         int portNumber = 11000;
         // Establish the local endpoint for the socket.
         // The DNS name of the computer
-        // running the listener is "host.contoso.com".
         IPHostEntry ipHostInfo = Dns.Resolve(Dns.GetHostName());
         IPAddress ipAddress = ipHostInfo.AddressList[0];
         Console.WriteLine(string.Format("Proxy server on address:{0} and port:{1}",ipAddress, portNumber));
@@ -67,6 +66,7 @@ public class AsynchronousSocketListener
 
                 // Wait until a connection is made before continuing.
                 allDone.WaitOne();
+                Console.WriteLine("ready for new connection");
             }
 
         }
@@ -84,7 +84,7 @@ public class AsynchronousSocketListener
     {
         // Signal the main thread to continue.
         allDone.Set();
-        Console.WriteLine("got call");
+        Console.WriteLine("start connection");
 
         // Get the socket that handles the client request.
         Socket listener = (Socket)ar.AsyncState;
@@ -117,32 +117,51 @@ public class AsynchronousSocketListener
             // Check for end-of-file tag. If it is not there, read 
             // more data.
             content = state.sb.ToString();
+
+            string[] splitContent = content.Split('\n');
+
             Console.WriteLine("Read {0} bytes from socket. \nData : {1}",
                     content.Length, content);
             Console.WriteLine("End of Data");
 
-            // Create a request for the URL. 
-            WebRequest request = WebRequest.Create(
-              "http://www.eecs.wsu.edu/~hauser/teaching/Networks-F15/lectures/calendar.html");
-            // If required by the server, set the credentials.
-            request.Credentials = CredentialCache.DefaultCredentials;
-            // Get the response.
-            WebResponse response = request.GetResponse();
-            // Display the status.
-            //Console.WriteLine(((HttpWebResponse)response).StatusDescription);
-            // Get the stream containing content returned by the server.
-            Stream dataStream = response.GetResponseStream();
-            // Open the stream using a StreamReader for easy access.
-            StreamReader reader = new StreamReader(dataStream);
-            // Read the content.
-            string responseFromServer = reader.ReadToEnd();
-            // Display the content.
+            string responseFromServer;
 
-            //response from request
-            Console.WriteLine(responseFromServer);
-            // Clean up the streams and the response.
-            reader.Close();
-            response.Close();
+            //checks type of request
+            if (splitContent[0].StartsWith("GET"))
+            {
+                //does with get request
+                // Create a request for the URL. 
+                string requestURL = splitContent[0].Split(' ')[1];
+
+                WebRequest request = WebRequest.Create(requestURL);
+                // If required by the server, set the credentials.
+                request.Credentials = CredentialCache.DefaultCredentials;
+                // Get the response.
+                WebResponse response = request.GetResponse();
+                // Display the status.
+                //Console.WriteLine(((HttpWebResponse)response).StatusDescription);
+                // Get the stream containing content returned by the server.
+                Stream dataStream = response.GetResponseStream();
+                // Open the stream using a StreamReader for easy access.
+                StreamReader reader = new StreamReader(dataStream);
+                // Read the content.
+                responseFromServer = reader.ReadToEnd();
+                // Display the content.
+
+                //response from request
+                //commented out to make output easier to read
+                //Console.WriteLine(responseFromServer);
+                // Clean up the streams and the response.
+                reader.Close();
+                response.Close();
+            }
+            else
+            {
+                responseFromServer = "Was not get";
+            }
+            //parse the request
+
+           
             //Send(handler, content);
             
             Send(handler, responseFromServer);
@@ -186,8 +205,10 @@ public class AsynchronousSocketListener
             int bytesSent = handler.EndSend(ar);
             Console.WriteLine("Sent {0} bytes to client.", bytesSent);
 
+            //may need to change this so we can handle http1.1
             handler.Shutdown(SocketShutdown.Both);
             handler.Close();
+            Console.WriteLine("end connecction");
 
         }
         catch (Exception e)

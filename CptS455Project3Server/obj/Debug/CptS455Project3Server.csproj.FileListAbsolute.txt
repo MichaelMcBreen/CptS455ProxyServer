@@ -4,3 +4,9 @@ c:\users\michael\documents\visual studio 2015\Projects\CptS455Project3Server\Cpt
 c:\users\michael\documents\visual studio 2015\Projects\CptS455Project3Server\CptS455Project3Server\obj\Debug\CptS455Project3Server.exe
 c:\users\michael\documents\visual studio 2015\Projects\CptS455Project3Server\CptS455Project3Server\obj\Debug\CptS455Project3Server.pdb
 c:\users\michael\documents\visual studio 2015\Projects\CptS455Project3Server\CptS455Project3Server\obj\Debug\CptS455Project3Server.csprojResolveAssemblyReference.cache
+C:\Users\Michael\Documents\Visual Studio 2015\Projects\CptS455ProxyServer\CptS455Project3Server\bin\Debug\CptS455Project3Server.exe.config
+C:\Users\Michael\Documents\Visual Studio 2015\Projects\CptS455ProxyServer\CptS455Project3Server\obj\Debug\CptS455Project3Server.exe
+C:\Users\Michael\Documents\Visual Studio 2015\Projects\CptS455ProxyServer\CptS455Project3Server\obj\Debug\CptS455Project3Server.pdb
+C:\Users\Michael\Documents\Visual Studio 2015\Projects\CptS455ProxyServer\CptS455Project3Server\bin\Debug\CptS455Project3Server.exe
+C:\Users\Michael\Documents\Visual Studio 2015\Projects\CptS455ProxyServer\CptS455Project3Server\bin\Debug\CptS455Project3Server.pdb
+C:\Users\Michael\Documents\Visual Studio 2015\Projects\CptS455ProxyServer\CptS455Project3Server\obj\Debug\CptS455Project3Server.csprojResolveAssemblyReference.cache
