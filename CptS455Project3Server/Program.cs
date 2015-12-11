@@ -8,6 +8,7 @@ using System;
 using System.IO;
 using System.Net;
 using System.Text;
+using System.Linq;
 
 // State object for reading client data asynchronously
 public class StateObject
@@ -111,76 +112,114 @@ public class AsynchronousSocketListener
 
         if (bytesRead > 0)
         {
-            // There  might be more data, so store the data received so far.
-            state.sb.Append(Encoding.ASCII.GetString(state.buffer, 0, bytesRead));
-
-            // Check for end-of-file tag. If it is not there, read 
-            // more data.
-            content = state.sb.ToString();
-
-            string[] splitContent = content.Split('\n');
-
-            Console.WriteLine("Read {0} bytes from socket. \nData : {1}",
-                    content.Length, content);
-            Console.WriteLine("End of Data");
-
-            string responseFromServer;
-
-            //checks type of request
-            if (splitContent[0].StartsWith("GET"))
+            try
             {
-                //does with get request
-                // Create a request for the URL. 
-                string requestURL = splitContent[0].Split(' ')[1];
+                // There  might be more data, so store the data received so far.
+                state.sb.Append(Encoding.ASCII.GetString(state.buffer, 0, bytesRead));
 
-                WebRequest request = WebRequest.Create(requestURL);
-                // If required by the server, set the credentials.
-                request.Credentials = CredentialCache.DefaultCredentials;
-                // Get the response.
-                WebResponse response = request.GetResponse();
-                // Display the status.
-                //Console.WriteLine(((HttpWebResponse)response).StatusDescription);
-                // Get the stream containing content returned by the server.
-                Stream dataStream = response.GetResponseStream();
-                // Open the stream using a StreamReader for easy access.
-                StreamReader reader = new StreamReader(dataStream);
-                // Read the content.
-                responseFromServer = reader.ReadToEnd();
-                // Display the content.
+                // Check for end-of-file tag. If it is not there, read 
+                // more data.
+                content = state.sb.ToString();
 
-                //response from request
-                //commented out to make output easier to read
-                //Console.WriteLine(responseFromServer);
-                // Clean up the streams and the response.
-                reader.Close();
-                response.Close();
+                string[] splitContent = content.Split('\n');
+
+                Console.WriteLine("Read {0} bytes from socket. \nData : {1}",
+                        content.Length, content);
+                Console.WriteLine("End of Data");
+
+                string responseFromServer;
+
+                //checks type of request
+                if (splitContent[0].StartsWith("GET"))
+                {
+                    //does with get request
+                    // Create a request for the URL. 
+                    string requestURL = splitContent[0].Split(' ')[1];
+
+                    Console.WriteLine(string.Format("Trying to reach:{0}", requestURL));
+
+                    HttpWebRequest request = (HttpWebRequest)WebRequest.Create(requestURL);
+
+                    request.Method = "GET";
+
+                    if(splitContent.FirstOrDefault(x => x.StartsWith("Connection:")) != null)
+                    {
+                        request.KeepAlive = splitContent.First(x => x.StartsWith("Connection:")).Split(' ')[1] == "keep-alive\r";
+                    }
+
+                    if (splitContent.FirstOrDefault(x => x.StartsWith("Accept:")) != null)
+                    {
+                        request.Accept = splitContent.First(x => x.StartsWith("Accept:")).Split(' ')[1].TrimEnd('\r');
+                    }
+
+                    if (splitContent.FirstOrDefault(x => x.StartsWith("Host:")) != null)
+                    {
+                        request.Host = splitContent.First(x => x.StartsWith("Host:")).Split(' ')[1].TrimEnd('\r');
+                    }
+
+                    if (splitContent.FirstOrDefault(x => x.StartsWith("User-Agent:")) != null)
+                    {
+                        request.UserAgent = splitContent.First(x => x.StartsWith("User-Agent:")).Substring(11).TrimEnd('\r');
+                    }
+
+                    if (splitContent.FirstOrDefault(x => x.StartsWith("Referer:")) != null)
+                    {
+                        request.Referer = splitContent.First(x => x.StartsWith("Referer:")).Split(' ')[1].TrimEnd('\r');
+                    }
+
+                    request.Credentials = CredentialCache.DefaultCredentials;
+                    
+                    // Get the response.
+                    WebResponse response = request.GetResponse();
+                    // Display the status.
+                    //Console.WriteLine(((HttpWebResponse)response).StatusDescription);
+                    // Get the stream containing content returned by the server.
+                    Stream dataStream = response.GetResponseStream();
+                    // Open the stream using a StreamReader for easy access.
+                    StreamReader reader = new StreamReader(dataStream);
+                    // Read the content.
+                    responseFromServer = reader.ReadToEnd();
+                    // Display the content.
+
+                    //response from request
+                    //commented out to make output easier to read
+                    //Console.WriteLine(responseFromServer);
+                    // Clean up the streams and the response.
+                    reader.Close();
+                    response.Close();
+                }
+                else
+                {
+                    responseFromServer = "Was not get";
+                }
+                //parse the request
+
+
+                //Send(handler, content);
+
+                Send(handler, responseFromServer);
+                /*
+                if (content.IndexOf("<EOF>") > -1)
+                {
+                    // All the data has been read from the 
+                    // client. Display it on the console.
+                    Console.WriteLine("Read {0} bytes from socket. \n Data : {1}",
+                        content.Length, content);
+                    // Echo the data back to the client.
+                    Send(handler, content);
+                }
+                else
+                {
+                    // Not all data received. Get more.
+                    handler.BeginReceive(state.buffer, 0, StateObject.BufferSize, 0,
+                    new AsyncCallback(ReadCallback), state);
+                }*/
             }
-            else
+            catch (Exception e)
             {
-                responseFromServer = "Was not get";
+                Console.WriteLine(e.ToString());
+                Send(handler, "");
             }
-            //parse the request
-
-           
-            //Send(handler, content);
-            
-            Send(handler, responseFromServer);
-            /*
-            if (content.IndexOf("<EOF>") > -1)
-            {
-                // All the data has been read from the 
-                // client. Display it on the console.
-                Console.WriteLine("Read {0} bytes from socket. \n Data : {1}",
-                    content.Length, content);
-                // Echo the data back to the client.
-                Send(handler, content);
-            }
-            else
-            {
-                // Not all data received. Get more.
-                handler.BeginReceive(state.buffer, 0, StateObject.BufferSize, 0,
-                new AsyncCallback(ReadCallback), state);
-            }*/
         }
     }
 
